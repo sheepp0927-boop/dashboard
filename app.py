@@ -1027,7 +1027,7 @@ def render_prediction_studio():
                 res = requests.post(
                     API_URL,
                     json=payload,
-                    timeout=30
+                    timeout=90
                 )
                 res.raise_for_status()
                 result = res.json()
