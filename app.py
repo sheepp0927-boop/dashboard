@@ -931,7 +931,8 @@ def render_prediction_studio():
             list(range(1, 13)),
             index=5
         )
-        is_weekend = st.radio("Is weekend?", ["No", "Yes"], horizontal=True)
+        is_weekend = "Yes" if day_of_week in ["Saturday", "Sunday"] else "No"
+        st.radio("Is weekend?", ["No", "Yes"], index=1 if is_weekend == "Yes" else 0, horizontal=True, disabled=True)
 
     with right:
         community_area_id = st.number_input(
@@ -1024,15 +1025,15 @@ def render_prediction_studio():
 
         try:
             with st.spinner("Running model inference..."):
-                res = requests.post(
-                    API_URL,
-                    json=payload,
-                    timeout=90
-                )
-                res.raise_for_status()
-                result = res.json()
+                try:
+                    res = requests.post(API_URL, json=payload, timeout=90)
+                    res.raise_for_status()
+                except requests.exceptions.ReadTimeout:
+                    st.warning("Model service is waking up. Retrying once...")
+                    res = requests.post(API_URL, json=payload, timeout=90)
+                    res.raise_for_status()
 
-            st.success("Prediction complete")
+                result = res.json()
 
             r1, r2 = st.columns([1.2, 1])
 
