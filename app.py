@@ -101,19 +101,20 @@ def custom_metric(label, value):
 @st.cache_data
 def load_crime_data():
     try:
-        # Loading your Lite Zip
-        df = pd.read_csv('Crime_Dataset_Lite.zip')
+        df = pd.read_csv('Crime_Dataset_Lite_small.csv')
         df['Date'] = pd.to_datetime(df['Date'])
         df['Year'] = df['Date'].dt.year
         df['Month'] = df['Date'].dt.month_name()
         df['Hour'] = df['Date'].dt.hour
         df['DayOfWeek'] = df['Date'].dt.day_name()
+
         for col in ['Community Area', 'Beat', 'District', 'Ward']:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+
         return df
     except FileNotFoundError:
-        st.error("❌ Crime_Dataset_Lite.zip not found.")
+        st.error("❌ Crime_Dataset_Lite.csv not found.")
         return pd.DataFrame()
 
 @st.cache_data
